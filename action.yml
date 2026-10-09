@@ -1,0 +1,38 @@
+name: Action Execution Policy for PowerShell
+description: Set PowerShell's ExecutionPolicy for this run.
+
+inputs:
+  execution-policy:
+    description: >
+      What policy to apply for this run.
+      { Unrestricted, RemoteSigned, AllSigned, Restricted, Default, Bypass, Undefined }
+      This is validated with a set using variations of PascalCase, lowercase, UPPERCASE, snake_case, camelCase and kebab-case.
+    required: true
+    # default: Bypass
+  execution-scope:
+    description: >
+      What scope this execution policy would apply to.
+      { Process, CurrentUser, LocalMachine, UserPolicy, MachinePolicy }
+      This is validated with a set using variations of PascalCase, lowercase, UPPERCASE, snake_case, camelCase and kebab-case.
+    required: false
+    default: CurrentUser
+  revert-on-completion:
+    description: Whether to revert the policy upon completion of the workflow.
+    required: false
+    default: 'true'
+  force-policy:
+    description: Force applying the policy even if it is already set.
+    required: false
+    default: 'false'
+
+runs:
+  using: node24
+  # pre: dist/setup.js
+  main: dist/main.js
+  post: dist/cleanup.js
+  post-if: inputs.revert-on-completion == 'true'
+
+
+branding:
+  color: blue
+  icon: terminal

@@ -1,0 +1,39 @@
+# A. Setup OS matrix
+# B. Setup Policy matrix
+
+# 1. Check current ExecutionPolicy
+# 2. Set ExecutionPolicy according to matrix value
+# 3. Check updated ExecutionPolicy
+# -. Unsure how to check if reverted...
+
+name: Test Policy Action
+
+on:
+    workflow_dispatch: 
+    # push:
+    #     branches: main
+    # pull_request:
+    #     branches: main
+    # schedule:
+    #     - cron: 0 12 * * *
+
+jobs:
+    test:
+        strategy:
+            matrix:
+                os: [windows, macos, ubuntu]
+                policy: [Bypass]
+                scope: [CurrentUser]
+        runs-on: ${{ matrix.os }}-latest
+        steps:
+            - name: Check current policy
+              shell: sh
+              run: powershell -Command "Get-ExecutionPolicy -ExecutionPolicy ${{ matrix.policy }} -Scope ${{ matrix.scope }}"
+            - name: Override current policy
+              uses: ./
+              with:
+                execution-policy: ${{ matrix.policy }}
+                execution-scope: ${{ matrix.scope }}
+            - name: Check after overriding policy
+              shell: sh
+              run: powershell -Command "Get-ExecutionPolicy -ExecutionPolicy ${{ matrix.policy }} -Scope ${{ matrix.scope }}"
